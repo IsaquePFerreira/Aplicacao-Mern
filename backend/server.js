@@ -73,6 +73,28 @@ app.put('/api/v1/books/:id', async (req, res) => {
 	}
 });
 
+app.delete('/api/v1/books/:id', async (req, res) => {
+	const {id} = req.params;
+	const {title, subtitle, author, genre, cover} = req.body;
+
+	if (!mongoose.Types.ObjectId.isValid(id)) {
+		return res.status(400).json({sucess: false, error: 'Id not is valid.'});
+	}
+
+	try {
+		const book = await Book.findById();
+		if (!book) {
+			return res.status(404).json({sucess: false, error: 'Book not found'});
+		}
+
+		const deleteBook = await Book.findByIdAndDelete();
+		res.status(200).json({sucess: true, data: deleteBook});
+	} catch (error) {
+		console.error('Error fetching books: ', error);
+		res.status(500).json({sycess: false, error: 'Error fetching books.'});
+	}
+});
+
 app.listen(3000, () => {
 	console.log('Server is running on port 3000. CTRL + C stop.');
 	connectToDabase();
